@@ -1,0 +1,6 @@
+po_number,vendor_id,description,amount_pre_tax,tax_rate,issued_date,owner,status
+PO-4501,V-101,"Office stationery and printer consumables, Q2",42600.00,0.18,2026-09-02,Ananya (Admin),open
+PO-4512,V-102,"Housekeeping services, Koramangala office, October 2026",68000.00,0.18,2026-09-25,Rahul (Facilities),open
+PO-4513,V-102,"Deep-cleaning, Gurugram office, one-off",24500.00,0.18,2026-09-28,Rahul (Facilities),open
+PO-4517,V-103,"Inter-city freight, festive-season inventory moves",200000.00,0.18,2026-08-20,Meera (Supply Chain),open
+PO-4520,V-104,"Printed brochures and event standees",45800.00,0.18,2026-10-01,Kabir (Marketing),open

@@ -1,0 +1,6 @@
+vendor_id,legal_name,aliases,gstin,status,payment_terms_days
+V-101,Northwind Office Supplies Pvt Ltd,Northwind Office Supplies|Northwind Supplies,29AAGCN4821K1Z5,approved,30
+V-102,Greenleaf Facility Services LLP,Greenleaf Facility|Greenleaf Services,29AAKFG7310M1Z2,approved,15
+V-103,Swift Route Logistics Pvt Ltd,Swift Route Logistics|SwiftRoute,06AAECS5521P1ZQ,approved,45
+V-104,Pixel Print Studio,Pixel Print|Pixel Print Studios,29BXRPS9081C1Z7,approved,30
+V-105,Brightline IT Rentals Pvt Ltd,Brightline IT|Brightline Rentals,29AAICB6623D1Z1,blocked,30

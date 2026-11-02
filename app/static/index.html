@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoice Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --ink:#14171f; --muted:#5d6472; --line:#e4e7ec; --soft:#f1f3f6;
+  --accent:#2f5bea; --ok:#1d8a4e; --ok-bg:#e7f6ee; --warn:#a86200; --warn-bg:#fff3e0;
+  --bad:#c0362c; --bad-bg:#fdecea; --run:#2f5bea; --run-bg:#eaf0ff;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+header{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:20px}
+.brand{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.brand i{width:22px;height:22px;border-radius:6px;background:var(--accent);display:inline-block}
+.brand small{font-weight:400;color:var(--muted);font-size:13px}
+nav{display:flex;gap:4px;margin-left:auto}
+nav a{padding:6px 12px;border-radius:8px;color:var(--muted);font-weight:500}
+nav a.on{background:var(--soft);color:var(--ink)} nav a:hover{text-decoration:none;color:var(--ink)}
+main{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+h1{font-size:20px;margin:0 0 4px} h2{font-size:15px;margin:0 0 12px} .sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(5,1fr)} .kpi .v{font-size:24px;font-weight:700} .kpi .l{color:var(--muted);font-size:12px}
+.two{grid-template-columns:1fr 1.6fr}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;font:inherit;font-weight:500;cursor:pointer}
+.btn:hover{background:var(--soft)} .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.good{background:var(--ok);border-color:var(--ok);color:#fff} .btn.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.drop{display:block;border:1.5px dashed #c5cbd6;border-radius:10px;padding:22px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.over{border-color:var(--accent);background:var(--run-bg)}
+.sample{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.sample .n{flex:1;font-size:13px} .sample .t{font-size:11px;color:var(--muted)}
+table{width:100%;border-collapse:collapse} th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12px} tr.click{cursor:pointer} tr.click:hover td{background:var(--soft)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.APPROVE,.ok{background:var(--ok-bg);color:var(--ok)} .HOLD,.warn{background:var(--warn-bg);color:var(--warn)}
+.REJECT,.fail{background:var(--bad-bg);color:var(--bad)} .running{background:var(--run-bg);color:var(--run)}
+.pending,.skip{background:var(--soft);color:var(--muted)}
+.mono{font-family:"JetBrains Mono",monospace;font-size:12px} td.mono{white-space:nowrap}
+.run{grid-template-columns:1.25fr 1fr;align-items:start}
+.stage{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)} .stage:first-child{border-top:0}
+.dot{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700}
+.stage .body{flex:1;min-width:0} .stage .head{display:flex;gap:8px;align-items:baseline}
+.stage .name{font-weight:600} .stage .ms{margin-left:auto;color:var(--muted);font-size:12px}
+.stage .sum{color:var(--muted);font-size:13px}
+details{margin-top:6px} summary{cursor:pointer;color:var(--accent);font-size:12px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:3px 10px;font-size:12.5px;margin-top:8px}
+.kv b{color:var(--muted);font-weight:500}
+.spin{width:14px;height:14px;border:2px solid #b8c7f7;border-top-color:var(--run);border-radius:50%;animation:s .8s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+.card.decision{border-width:2px;color:var(--ink);background:var(--panel)} .decision.APPROVE{border-color:var(--ok)} .decision.HOLD{border-color:var(--warn)} .decision.REJECT{border-color:var(--bad)}
+.decision .big{font-size:26px;font-weight:700;letter-spacing:.5px}
+.decision ul{margin:6px 0 0;padding-left:18px} .decision li{margin:3px 0}
+.label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:14px}
+pre.q{white-space:pre-wrap;background:var(--soft);border-radius:8px;padding:12px;font:12.5px/1.5 Inter,sans-serif;margin:6px 0 0}
+iframe{width:100%;height:520px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.poBar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--soft);margin:8px 0 4px}
+.poBar span{display:block;height:100%}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted)} .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.empty{color:var(--muted);text-align:center;padding:30px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.run{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand"><i></i>Invoice Desk <small>PDF in, decision out, every step visible</small></div>
+  <nav><a href="#/" data-r="dash">Dashboard</a><a href="#/reference" data-r="ref">Reference data</a></nav>
+  <button class="btn" onclick="resetDemo()" title="Clear all runs">Reset demo</button>
+</div></header>
+<main id="app"></main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inr = x => x == null ? "—" : "₹" + Number(x).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+const ago = t => new Date(t * 1000).toLocaleString("en-IN", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+const api = (p, o) => fetch(p, o).then(async r => { if (!r.ok) throw new Error((await r.json()).detail || r.statusText); return r.json(); });
+const ICON = {ok:"✓", warn:"!", fail:"✕", skip:"–", pending:""};
+const SAMPLE_INFO = {
+  "01": ["Happy path", "Clean PDF, PO quoted, numbers match"],
+  "02": ["Edge: scanned, no PO", "Image-only PDF, PO must be inferred, small overage"],
+  "03": ["Edge: split PO overrun", "Second invoice on a PO already part-billed"],
+  "04": ["Edge: missing fields", "No invoice no. or date, line items don't add up"],
+  "05": ["Edge: disguised duplicate", "Vendor resends invoice with a reformatted number"],
+};
+let timer = null;
+
+function route() {
+  clearInterval(timer);
+  const h = location.hash || "#/";
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on",
+    (a.dataset.r === "ref") === h.startsWith("#/reference") && !h.startsWith("#/run")));
+  if (h.startsWith("#/run/")) return runView(+h.split("/")[2]);
+  if (h.startsWith("#/reference")) return refView();
+  dashboard();
+}
+window.addEventListener("hashchange", route);
+
+async function dashboard() {
+  const [runs, samples] = await Promise.all([api("/api/runs"), api("/api/samples")]);
+  const done = runs.filter(r => r.state === "done");
+  const n = d => done.filter(r => r.decision === d).length;
+  const pct = done.length ? Math.round(100 * n("APPROVE") / done.length) : 0;
+  const open = done.filter(r => r.final_status === "needs review").length;
+  const value = done.filter(r => r.final_status.startsWith("approved")).reduce((a, r) => a + (r.total || 0), 0);
+  $("#app").innerHTML = `
+    <h1>Accounts payable inbox</h1>
+    <p class="sub">Drop a vendor invoice. It is read, checked against the vendor master, open POs and payment history, then approved, held for a person, or rejected, with the reason.</p>
+    <div class="grid kpis">
+      ${kpi(done.length, "Invoices processed")}${kpi(pct + "%", "Auto-approved (no human touch)")}
+      ${kpi(open, "Waiting on a person")}${kpi(n("REJECT"), "Rejected")}${kpi(inr(value), "Value approved")}
+    </div>
+    <div class="grid two" style="margin-top:16px">
+      <div class="card">
+        <h2>New invoice</h2>
+        <label class="drop" id="drop">Drop a PDF here or <a>choose a file</a><input type="file" accept="application/pdf" hidden id="file"></label>
+        <div class="label" style="margin:16px 0 4px">Demo inputs</div>
+        ${samples.map(s => { const [t, d] = SAMPLE_INFO[s.slice(0,2)] || [s, ""]; return `
+          <div class="sample"><div class="n"><b>${esc(t)}</b><div class="t">${esc(d)}</div></div>
+          <a href="/api/samples/${encodeURIComponent(s)}/pdf" target="_blank" class="t">PDF</a>
+          <button class="btn" onclick="runSample('${esc(s)}')">Run</button></div>`; }).join("")}
+      </div>
+      <div class="card">
+        <h2>Run history</h2>
+        ${runs.length ? `<table><tr><th>#</th><th>Received</th><th>Vendor</th><th>Invoice</th><th class="num">Total</th><th>PO</th><th>Decision</th><th>Status</th></tr>
+        ${runs.map(r => `<tr class="click" onclick="location.hash='#/run/${r.id}'">
+          <td>${r.id}</td><td>${ago(r.created)}</td><td>${esc(r.vendor_name || r.filename)}</td>
+          <td class="mono">${esc(r.invoice_number || "—")}</td><td class="num">${inr(r.total)}</td>
+          <td class="mono">${esc(r.po_number || "—")}</td>
+          <td>${r.state === "done" ? `<span class="chip ${r.decision}">${r.decision}</span>` : `<span class="chip running">running</span>`}</td>
+          <td>${esc(r.final_status || "")}</td></tr>`).join("")}</table>`
+        : `<div class="empty">No invoices yet. Run a demo input on the left.</div>`}
+      </div>
+    </div>`;
+  const drop = $("#drop"), file = $("#file");
+  file.onchange = () => file.files[0] && upload(file.files[0]);
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); e.dataTransfer.files[0] && upload(e.dataTransfer.files[0]); };
+  if (runs.some(r => r.state !== "done")) timer = setInterval(dashboard, 1500);
+}
+const kpi = (v, l) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+
+async function upload(f) {
+  const fd = new FormData(); fd.append("file", f);
+  try { const r = await api("/api/runs", {method: "POST", body: fd}); location.hash = "#/run/" + r.id; }
+  catch (e) { alert(e.message); }
+}
+async function runSample(name) {
+  const r = await api("/api/samples/" + encodeURIComponent(name), {method: "POST"});
+  location.hash = "#/run/" + r.id;
+}
+async function resetDemo() {
+  if (!confirm("Clear all runs and start the demo fresh?")) return;
+  await api("/api/reset", {method: "POST"}); location.hash = "#/"; route();
+}
+
+async function runView(id) {
+  $("#app").innerHTML = `<p><a href="#/">← Dashboard</a></p><div id="runHead"></div>
+    <div class="grid run">
+      <div class="card"><h2>Live run</h2><div id="stages"></div></div>
+      <div class="grid">
+        <div id="decision"></div>
+        <div class="card"><h2>Source document <a href="/api/runs/${id}/pdf" target="_blank" style="font-weight:400;font-size:12px">open PDF</a></h2>
+          <img src="/api/runs/${id}/page.png" alt="Invoice page 1" style="width:100%;border:1px solid var(--line);border-radius:8px"></div>
+      </div>
+    </div>`;
+  const tick = async () => {
+    const r = await api("/api/runs/" + id);
+    renderRun(r);
+    if (r.state === "done") clearInterval(timer);
+  };
+  await tick();
+  timer = setInterval(tick, 400);
+}
+
+function renderRun(r) {
+  const done = r.state === "done";
+  $("#runHead").innerHTML = `
+    <h1>Run #${r.id} <span class="chip ${done ? r.decision : "running"}">${done ? r.decision : "running"}</span></h1>
+    <p class="sub">${esc(r.filename)} · received ${ago(r.created)}${r.finished ? ` · finished in ${(r.finished - r.created).toFixed(1)}s` : ""}</p>`;
+  $("#stages").innerHTML = Object.entries(r.stages).map(([k, s], i) => stageRow(k, s, i)).join("");
+  $("#decision").innerHTML = r.result ? decisionCard(r)
+    : `<div class="card"><div class="label" style="margin:0">Decision</div><p class="sub" style="margin:8px 0 0">Working through the checks…</p></div>`;
+}
+
+function stageRow(k, s, i) {
+  const st = s.status;
+  const dot = st === "running" ? `<div class="dot running"><div class="spin"></div></div>` : `<div class="dot ${st}">${ICON[st] ?? i + 1}</div>`;
+  return `<div class="stage">${dot}<div class="body">
+    <div class="head"><span class="name">${i + 1}. ${esc(s.label)}</span>${s.ms != null ? `<span class="ms">${s.ms} ms</span>` : ""}</div>
+    <div class="sum">${esc(s.summary || (st === "running" ? "Running…" : st === "pending" ? "Waiting" : ""))}</div>
+    ${s.detail && Object.keys(s.detail).length && k !== "decision" ? `<details ${["po_match","arithmetic","extract"].includes(k) && st !== "ok" ? "open" : ""}><summary>Evidence</summary>${detail(k, s.detail)}</details>` : ""}
+  </div></div>`;
+}
+
+function kvs(o) {
+  return `<div class="kv">${Object.entries(o).filter(([, v]) => v != null && v !== "" && typeof v !== "object")
+    .map(([k, v]) => `<b>${esc(k.replace(/_/g, " "))}</b><span class="mono">${esc(typeof v === "number" && v > 999 ? inr(v) : v)}</span>`).join("")}</div>`;
+}
+
+function detail(k, d) {
+  if (k === "read") return kvs(d) + `<pre class="q mono">${esc((d.preview || []).join("\n"))}</pre>`;
+  if (k === "extract") return kvs(d.fields) + (d.missing?.length ? `<div class="kv"><b>missing</b><span style="color:var(--bad)">${esc(d.missing.join(", "))}</span></div>` : "")
+    + (d.line_items?.length ? `<table style="margin-top:8px"><tr><th>Line item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr>
+      ${d.line_items.map(l => `<tr><td>${esc(l.description)}</td><td class="num">${l.qty}</td><td class="num">${inr(l.rate)}</td><td class="num">${inr(l.amount)}</td></tr>`).join("")}</table>` : "")
+    + `<div class="kv"><b>method</b><span>${esc(d.method)}${d.filled_by_llm ? " (LLM filled: " + esc(d.filled_by_llm.join(", ")) + ")" : ""}</span></div>`;
+  if (k === "arithmetic") return `<ul style="margin:8px 0 0;padding-left:18px">${d.checks.map(c => `<li style="color:${c.ok ? "var(--ok)" : "var(--bad)"}">${c.ok ? "✓" : "✕"} ${esc(c.check)}</li>`).join("")}</ul>`;
+  if (k === "po_match" && d.po_amount_pre_tax) {
+    const T = Math.max(d.po_amount_pre_tax, d.already_invoiced + d.this_invoice_pre_tax);
+    const w = x => (100 * x / T).toFixed(1) + "%";
+    const fit = Math.max(0, Math.min(d.this_invoice_pre_tax, d.remaining_before));
+    const over = Math.max(0, d.this_invoice_pre_tax - d.remaining_before);
+    return `<div class="poBar"><span style="width:${w(d.already_invoiced)};background:#9aa3b2"></span><span style="width:${w(fit)};background:var(--ok)"></span><span style="width:${w(over)};background:var(--bad)"></span></div>
+      <div class="legend"><span><i style="background:#9aa3b2"></i>Already invoiced ${inr(d.already_invoiced)}</span><span><i style="background:var(--ok)"></i>This invoice, within PO</span><span><i style="background:var(--bad)"></i>Over PO ${inr(over)}</span></div>`
+      + kvs({po: d.po, matched: d.matched, po_description: d.po_description, po_owner: d.po_owner, po_amount_pre_tax: d.po_amount_pre_tax,
+             remaining_before: d.remaining_before, this_invoice_pre_tax: d.this_invoice_pre_tax, tolerance: d.tolerance})
+      + (d.prior_invoices?.length ? `<div class="kv"><b>earlier invoices</b><span>${d.prior_invoices.map(p => `${esc(p.invoice)} ${inr(p.amount)} (${esc(p.source)})`).join("<br>")}</span></div>` : "")
+      + (d.candidates ? `<div class="kv"><b>candidates scored</b><span>${d.candidates.map(c => `${c.po}: amount gap ${c.amount_gap_pct}%, ${c.shared_words} shared words`).join("<br>")}</span></div>` : "");
+  }
+  if (k === "po_match" && d.candidates) return `<div class="kv"><b>candidates</b><span>${d.candidates.map(c => `${c.po}: gap ${c.amount_gap_pct}%, ${c.shared_words} words`).join("<br>")}</span></div>`;
+  if (k === "duplicate") return kvs({normalised_invoice_no: d.normalised_invoice_no, compared_against: d.compared_against})
+    + (d.match ? `<div class="kv"><b>matched earlier</b><span class="mono">${esc(d.match.invoice_number)} · ${inr(d.match.total)} · ${esc(d.match.source || "run #" + d.match.run_id)}</span></div>` : "")
+    + (d.possible_match ? `<div class="kv"><b>similar earlier</b><span class="mono">${esc(d.possible_match.invoice_number)} · ${inr(d.possible_match.total)}</span></div>` : "");
+  return kvs(d);
+}
+
+function decisionCard(r) {
+  const d = r.result, rev = r.review;
+  return `<div class="card decision ${d.outcome}">
+    <div class="label" style="margin:0">Decision</div>
+    <div class="big" style="color:var(--${d.outcome === "APPROVE" ? "ok" : d.outcome === "HOLD" ? "warn" : "bad"})">${d.outcome}</div>
+    <div><b>${esc(d.next_action)}</b></div>
+    <div class="label">Routed to</div><div>${esc(d.route_to)}</div>
+    ${d.reasons.length ? `<div class="label">Why</div><ul>${d.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    ${d.notes.length ? `<div class="label">Noted for the audit trail</div><ul>${d.notes.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    ${d.vendor_query ? `<div class="label">Draft query to vendor <a style="font-weight:500;text-transform:none;letter-spacing:0" onclick="navigator.clipboard.writeText(this.closest('.card').querySelector('pre').innerText)">copy</a></div><pre class="q">${esc(d.vendor_query)}</pre>` : ""}
+    ${d.outcome === "HOLD" ? (rev
+      ? `<div class="label">Human review</div><div><span class="chip ${rev.action === "approve" ? "APPROVE" : "REJECT"}">${esc(r.final_status)}</span> by ${esc(rev.reviewer)}${rev.note ? ": “" + esc(rev.note) + "”" : ""}</div>`
+      : `<div class="label">Human review</div>
+         <input id="note" placeholder="Note for the audit trail (optional)" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font:inherit;margin:6px 0">
+         <button class="btn good" onclick="review(${r.id},'approve')">Approve anyway</button> <button class="btn bad" onclick="review(${r.id},'reject')">Reject</button>`) : ""}
+  </div>`;
+}
+
+async function review(id, action) {
+  await api(`/api/runs/${id}/review`, {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({action, note: $("#note").value})});
+  runView(id);
+}
+
+async function refView() {
+  const d = await api("/api/reference");
+  const t = (rows, cols) => `<table><tr>${cols.map(c => `<th>${c.replace(/_/g, " ")}</th>`).join("")}</tr>${rows.map(r => `<tr>${cols.map(c => `<td class="${typeof r[c] === "number" ? "num" : ""}">${typeof r[c] === "number" && r[c] > 1 ? inr(r[c]) : esc(r[c])}</td>`).join("")}</tr>`).join("")}</table>`;
+  $("#app").innerHTML = `<h1>Reference data</h1><p class="sub">What every invoice is checked against. In production these come from the ERP; here they are CSVs in <span class="mono">data/</span>.</p>
+    <div class="grid">
+      <div class="card"><h2>Rules</h2>${kvs({"price tolerance": d.rules.tolerance_pct + "% of PO, capped at ₹" + d.rules.tolerance_abs.toLocaleString("en-IN"),
+        "possible-duplicate window": d.rules.duplicate_window_days + " days", "minimum OCR confidence": d.rules.ocr_min_confidence + "%"})}</div>
+      <div class="card"><h2>Vendor master</h2>${t(d.vendors, ["vendor_id", "legal_name", "gstin", "status", "payment_terms_days"])}</div>
+      <div class="card"><h2>Purchase orders</h2>${t(d.purchase_orders, ["po_number", "vendor_id", "description", "amount_pre_tax", "owner", "status"])}</div>
+      <div class="card"><h2>Invoices already in the ERP</h2>${t(d.erp_history, ["vendor_id", "invoice_number", "invoice_date", "po_number", "amount_pre_tax", "total", "status"])}</div>
+    </div>`;
+}
+route();
+</script>
+</body>
+</html>
